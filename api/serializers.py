@@ -49,7 +49,13 @@ class ReportGeneratorRequestSerializer(serializers.Serializer):
     p_name = serializers.CharField(max_length=50)
     from_date = serializers.DateField()
     to_date = serializers.DateField()
-    
+
+class GenerateAnalysisSerializer(serializers.Serializer):
+    u_id = serializers.IntegerField()
+    p_name = serializers.CharField(max_length=50)
+    from_date = serializers.DateField()
+    to_date = serializers.DateField()
+
 
 # class TestSerializer(serializers.ModelSerializer):
 #     class Meta:

@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from datetime import datetime
 from .ReportGenrator.report_gen import generate_report
 import numpy as np
+import json
 
 
 
@@ -190,7 +191,39 @@ class GenerateReport(APIView):
             return Response({'message':f'No data found between {from_date} and {to_date} '}, status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
+class GenerateAnalysis(APIView):
+    serializer_class = GenerateAnalysisSerializer
+    def post(self, request, fromat = None):
+        serializer = self.serializer_class(data = request.data)
+        if serializer.is_valid():
+            u_id = serializer.data.get('u_id')
+            p_name = serializer.data.get('p_name')
+            from_date = serializer.data.get('from_date')
+            to_date = serializer.data.get('to_date')
+            queryset = GraphDatabase.objects.filter(date__range=(from_date, to_date), u_id=u_id, p_name=p_name)
+            if queryset.exists():
+                average_time_array = []
+                date_array = []
+                for dates in queryset:
+                    date = dates.date
+                    if date in date_array :
+                        continue
+                    date_array.append(date)
+                    mainset = GraphDatabase.objects.filter(date=date,u_id=u_id,p_name=p_name)
+                    if mainset.exists():
+                        count =0
+                        val = 0 
+                        for timedata in mainset:
+                            count +=1
+                            lst = list(timedata.time_array)
+                            val += float(lst[-1])
+                        average_time_array.append(round(val/count,2))
+                    else:
+                        average_time_array.append(0)
+                return Response({"u_id":u_id,"p_name":p_name,"average_time_array":average_time_array,"date_array":date_array},status=status.HTTP_200_OK)
+            return Response({'message':f'No data found between {from_date} and {to_date} '}, status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
 
 
 def display(request):

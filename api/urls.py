@@ -10,5 +10,6 @@ urlpatterns = [
     path('graph-data/', views.GraphDataSave.as_view()),
     path('get-graph-data/', views.GarphDataSend.as_view()),
     path('generate-report/', views.GenerateReport.as_view()),
+    path('generate-analysis/', views.GenerateAnalysis.as_view())
     # path('test/', views.TestAPIView.as_view())
 ]
